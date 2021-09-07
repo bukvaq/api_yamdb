@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category
 from users.models import User
 
 
@@ -27,7 +26,10 @@ class ConfirmationSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserForAdminSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())])
 
     class Meta:
         model = User
@@ -35,9 +37,6 @@ class UserSerializer(serializers.ModelSerializer):
                   'email', 'role', 'bio')
 
 
-class CategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Category
-        fields = '__all__'
+class UserSerializer(UserForAdminSerializer):
+    role = serializers.CharField(read_only=True)
 

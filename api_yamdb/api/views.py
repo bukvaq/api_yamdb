@@ -1,15 +1,20 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework.decorators import api_view, action
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from rest_framework import viewsets, status
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status, filters
+from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+
 from users.models import User
-from reviews.models import *
-from .serializers import *
+from .permissions import IsAdmin
+from .serializers import (
+    UserSerializer,
+    ConfirmationSerializer,
+    EmailSerializer,
+    UserForAdminSerializer)
 
 
 @api_view(['POST'])
@@ -18,11 +23,14 @@ def signup(request):
     serializer_data.is_valid(raise_exception=True)
     email = serializer_data.data.get('email')
     username = serializer_data.data.get('username')
+    if username == '':
+        return Response('неверное имя пользователя',
+                        status=status.HTTP_400_BAD_REQUEST)
     if username == 'me':
         return Response('неверное имя пользователя',
                         status=status.HTTP_400_BAD_REQUEST)
     user, create = User.objects.get_or_create(email=email, username=username,
-                                              is_active=False)
+                                              )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         'Отправляем код для проверки электронной почты',
@@ -49,18 +57,24 @@ def get_token(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserForAdminSerializer
+    permission_classes = [IsAdmin]
+    lookup_field = "username"
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+          "=username",
+       ]
 
     @action(
         detail=False,
         methods=["get", "patch"],
-        permission_classes=[IsAuthenticated],)
+        permission_classes=[IsAuthenticated, ])
     def me(self, request):
         user = get_object_or_404(User, pk=request.user.id)
-        if request.metod == 'GET':
+        if request.method == 'GET':
             serializer = UserSerializer(user, many=False)
             return Response(serializer.data)
-        if request.metod == 'PATCH':
+        if request.method == 'PATCH':
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -69,12 +83,11 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-
-class TitlesViewSet(viewsets.ModelViewSet):
+class CategoriesViewSet(viewsets.ModelViewSet):
     pass
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
+class TitlesViewSet(viewsets.ModelViewSet):
     pass
 
 

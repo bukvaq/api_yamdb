@@ -17,7 +17,7 @@ router.register(r'users', UserViewSet,
                 basename='users')
 router.register(r'titles', TitlesViewSet,
                 basename='titles')
-router.register(r'categories', CategoriesViewSet,
+router.register('categories', CategoriesViewSet,
                 basename='categories')
 router.register(r'genres', GenresViewSet,
                 basename='genres')
