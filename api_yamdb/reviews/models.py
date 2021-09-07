@@ -22,7 +22,7 @@ class Titles(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
     category = models.ForeignKey(Categories, on_delete=models.PROTECT)
-    genre = models.ForeignKey(Genres, on_delete=models.PROTECT)
+    genre = models.ManyToManyField(Genres, on_delete=models.PROTECT)
     description = models.TextField(blank=True)
 
     def __str__(self):
