@@ -56,31 +56,7 @@ def get_token(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserForAdminSerializer
-    permission_classes = [IsAdmin]
-    lookup_field = "username"
-    filter_backends = [filters.SearchFilter]
-    search_fields = [
-          "=username",
-       ]
-
-    @action(
-        detail=False,
-        methods=["get", "patch"],
-        permission_classes=[IsAuthenticated, ])
-    def me(self, request):
-        user = get_object_or_404(User, pk=request.user.id)
-        if request.method == 'GET':
-            serializer = UserSerializer(user, many=False)
-            return Response(serializer.data)
-        if request.method == 'PATCH':
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    pass
 
 
 class CategoriesViewSet(viewsets.ModelViewSet):
