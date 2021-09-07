@@ -1,4 +1,4 @@
-from django.db import models 
+from django.db import models
 
 from users.models import User
 
@@ -23,7 +23,7 @@ class Review(models.Model):
 
     def __str__(self):
         return self.text
-    
+
     class Meta:
         unique_together = ('author', 'title_id')
 
