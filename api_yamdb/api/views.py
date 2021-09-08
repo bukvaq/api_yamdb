@@ -128,6 +128,9 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def perform_update(self, serializer):
+        return super().perform_update(serializer)
+
 
 class CommentsViewSet(ReviewsViewSet):
     """Вьюсет для комментариев,
