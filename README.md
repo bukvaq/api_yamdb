@@ -54,16 +54,16 @@ pprint(request)
 ```
 Ответ от API:
 ```json
-{'count': 3,
- 'next': None,
- 'previous': None,
- 'results': [{'name': 'Фильм', 'slug': 'movie'},
-             {'name': 'Книга', 'slug': 'book'},
-             {'name': 'Музыка', 'slug': 'music'}]}
+{"count": 3,
+ "next": "None",
+ "previous": "None",
+ "results": [{"name": "Фильм", "slug": "movie"},
+             {"name": "Книга", "slug": "book"},
+             {"name": "Музыка", "slug": "music"}]}
 ```
 ***
 ## Авторы проекта:
-#### * Дарья Понамарёва
-#### * Евгений Салахутдинов
-#### * Максим Шамшурин
+* Дарья Понамарёва
+* Евгений Салахутдинов
+* Максим Шамшурин
 ***
