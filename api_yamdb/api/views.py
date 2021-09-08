@@ -2,14 +2,17 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import PageNumberPagination
 
+from reviews.models import Categories, Titles, Genres
 from users.models import User
-from .permissions import IsAdmin, ReviewPermission
+from .permissions import IsAdmin, ReviewPermission, AdminPermissionOrReadOnly
 from .serializers import (
     UserSerializer,
     ConfirmationSerializer,
@@ -17,6 +20,10 @@ from .serializers import (
     UserForAdminSerializer,
     CommentSerializer,
     ReviewSerializer)
+    GenresSerializer,
+    CategoriesSerializer,
+    TitlesSerializer)
+)
 
 
 @api_view(['POST'])
@@ -25,9 +32,7 @@ def signup(request):
     serializer_data.is_valid(raise_exception=True)
     email = serializer_data.data.get('email')
     username = serializer_data.data.get('username')
-    if username == '':
-        return Response('неверное имя пользователя',
-                        status=status.HTTP_400_BAD_REQUEST)
+
     if username == 'me':
         return Response('неверное имя пользователя',
                         status=status.HTTP_400_BAD_REQUEST)
@@ -58,19 +63,56 @@ def get_token(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = User.objects.all()
+    serializer_class = UserForAdminSerializer
+    permission_classes = [IsAdmin]
+    lookup_field = "username"
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["=username", ]
+
+    @action(
+        detail=False,
+        methods=["get", "patch"],
+        permission_classes=[IsAuthenticated, ])
+    def me(self, request):
+        user = get_object_or_404(User, pk=request.user.id)
+        if request.method == 'GET':
+            serializer = UserSerializer(user, many=False)
+            return Response(serializer.data)
+        if request.method == 'PATCH':
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class CategoriesViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter)
+    search_fields = ('name',)
+    permission_classes = (AdminPermissionOrReadOnly,)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend)
+    filterset_fields = ('category', 'genre', 'name', 'year')
+    permission_classes = (AdminPermissionOrReadOnly,)
 
 
 class GenresViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Genres.objects.all()
+    serializer_class = GenresSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter)
+    search_fields = ('name',)
+    permission_classes = (AdminPermissionOrReadOnly,)
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
