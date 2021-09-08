@@ -24,14 +24,14 @@ class Titles(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
     category = models.ForeignKey(Categories, on_delete=models.PROTECT)
-    genre = models.ManyToManyField(Genres, on_delete=models.PROTECT)
+    genre = models.ManyToManyField(Genres)
     description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
-      
 
-class Review(models.Model):
+
+class Reviews(models.Model):
     """Модель для хранения обзоров,
     оценки можно ставить от 1 до 10."""
 
@@ -56,14 +56,14 @@ class Review(models.Model):
         unique_together = ('author', 'title_id')
 
 
-class Comment(models.Model):
+class Comments(models.Model):
     """Модель для комментариев под обзорами."""
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments'
     )
     review_id = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments'
+        Reviews, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
