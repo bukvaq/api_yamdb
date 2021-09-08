@@ -26,4 +26,3 @@ class ReviewPermission(BasePermission):
         return (request.method in SAFE_METHODS or
                 obj.author == request.user or
                 request.user.role in ['admin', 'moderator'])
-

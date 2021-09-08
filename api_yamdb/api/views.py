@@ -12,12 +12,14 @@ from rest_framework.pagination import PageNumberPagination
 
 from reviews.models import Categories, Titles, Genres
 from users.models import User
-from .permissions import IsAdmin, AdminPermissionOrReadOnly
+from .permissions import IsAdmin, ReviewPermission, AdminPermissionOrReadOnly
 from .serializers import (
     UserSerializer,
     ConfirmationSerializer,
     EmailSerializer,
     UserForAdminSerializer,
+    CommentSerializer,
+    ReviewSerializer)
     GenresSerializer,
     CategoriesSerializer,
     TitlesSerializer)
@@ -114,8 +116,23 @@ class GenresViewSet(viewsets.ModelViewSet):
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
-    pass
+    """Вьюсет для обзоров."""
+    permission_classes = (ReviewPermission,)
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title = Title.objects.get(id=self.kwargs['title_id'])
+        return title.reviews
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
-class CommentsViewSet(viewsets.ModelViewSet):
-    pass
+class CommentsViewSet(ReviewsViewSet):
+    """Вьюсет для комментариев,
+    наследуется от вьюсета обзоров"""
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        review = Review.objects.get(id=self.kwargs['review_id'])
+        return review.comments
