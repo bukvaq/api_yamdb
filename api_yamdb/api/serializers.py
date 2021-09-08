@@ -39,4 +39,3 @@ class UserForAdminSerializer(serializers.ModelSerializer):
 
 class UserSerializer(UserForAdminSerializer):
     role = serializers.CharField(read_only=True)
-
