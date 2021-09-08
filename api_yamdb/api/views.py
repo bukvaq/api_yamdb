@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 
-from reviews.models import Categories, Titles, Genres
+from reviews.models import Categories, Titles, Genres, Review
 from users.models import User
 from .permissions import IsAdmin, ReviewPermission, AdminPermissionOrReadOnly
 from .serializers import (
@@ -19,10 +19,10 @@ from .serializers import (
     EmailSerializer,
     UserForAdminSerializer,
     CommentSerializer,
-    ReviewSerializer)
+    ReviewSerializer,
     GenresSerializer,
     CategoriesSerializer,
-    TitlesSerializer)
+    TitlesSerializer
 )
 
 
@@ -121,7 +121,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
-        title = Title.objects.get(id=self.kwargs['title_id'])
+        title = Titles.objects.get(id=self.kwargs['title_id'])
         return title.reviews
 
     def perform_create(self, serializer):

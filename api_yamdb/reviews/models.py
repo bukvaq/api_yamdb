@@ -41,7 +41,7 @@ class Review(models.Model):
         User, on_delete=models.CASCADE, related_name='reviews'
     )
     title_id = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews'
+        Titles, on_delete=models.CASCADE, related_name='reviews'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
