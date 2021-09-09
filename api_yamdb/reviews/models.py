@@ -26,8 +26,10 @@ class Titles(models.Model):
     """Модель для хранения названий произведений."""
     name = models.CharField(max_length=256)
     year = models.IntegerField()
+
     category = models.ForeignKey(
-        Categories, null=True, on_delete=models.SET_NULL
+        Categories, on_delete=models.SET_NULL,
+        related_name='titles', blank=True, null=True
     )
     genre = models.ManyToManyField(Genres)
     description = models.TextField(blank=True)
@@ -36,7 +38,7 @@ class Titles(models.Model):
         return self.name
 
 
-class Review(models.Model):
+class Reviews(models.Model):
     """Модель для хранения обзоров,
     оценки можно ставить от 1 до 10."""
 
@@ -61,14 +63,14 @@ class Review(models.Model):
         unique_together = ('author', 'title_id')
 
 
-class Comment(models.Model):
+class Comments(models.Model):
     """Модель для комментариев под обзорами."""
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments'
     )
     review_id = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments'
+        Reviews, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(

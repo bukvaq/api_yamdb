@@ -4,7 +4,7 @@ from rest_framework.validators import UniqueValidator
 import datetime as dt
 
 from users.models import User
-from reviews.models import Comment, Review, Categories, Genres, Titles
+from reviews.models import Comments, Reviews, Categories, Genres, Titles
 
 
 class EmailSerializer(serializers.ModelSerializer):
@@ -86,7 +86,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Comment
+        model = Comments
         fields = ('id', 'review_id', 'text', 'pub_date', 'author')
         read_only_fields = ('id', 'pub_date', 'author', 'review_id')
 
@@ -99,7 +99,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    def validate(self, data):
+        if Reviews.objects.filter(
+            author=data['author'], title_id=data['title_id']
+        ).exists():
+            raise serializers.ValidationError(
+                'Нельзя создавать больше одного обзора'
+            )
+        return data
+
     class Meta:
-        model = Review
+        model = Reviews
         fields = ('id', 'title_id', 'text', 'pub_date', 'author', 'score')
         read_only_fields = ('id', 'pub_date', 'author', 'title_id')
