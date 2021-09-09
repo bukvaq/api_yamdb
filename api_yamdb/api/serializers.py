@@ -1,13 +1,14 @@
+import datetime as dt
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-import datetime as dt
-
+from reviews.models import Comments, Review, Categories, Genres, Title
 from users.models import User
-from reviews.models import Comments, Reviews, Categories, Genres, Titles
 
 
 class EmailSerializer(serializers.ModelSerializer):
+    """Сериализатор для электронной почты и ник-нейма."""
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())])
@@ -21,6 +22,7 @@ class EmailSerializer(serializers.ModelSerializer):
 
 
 class ConfirmationSerializer(serializers.ModelSerializer):
+    """Сериализатор для кода подтверждения."""
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
@@ -30,6 +32,7 @@ class ConfirmationSerializer(serializers.ModelSerializer):
 
 
 class UserForAdminSerializer(serializers.ModelSerializer):
+    """Сериализатор для пользователей."""
     username = serializers.CharField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())])
@@ -41,39 +44,55 @@ class UserForAdminSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(UserForAdminSerializer):
+    """Сериализатор для пользователя-админа."""
     role = serializers.CharField(read_only=True)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(validators=[UniqueValidator(
-        queryset=Categories.objects.all())])
+    """Сериализатор для категорий."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Categories
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(validators=[UniqueValidator(
-        queryset=Genres.objects.all())])
+    """Сериализатор для жанров."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Genres
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    genre = serializers.StringRelatedField(many=True)
+    """Сериализатор для названий произведений, метод 'list' """
+    genre = GenresSerializer(many=True, read_only=True)
+    category = CategoriesSerializer(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = '__all__'
-        model = Titles
+        model = Title
 
     def validate_title_year(self, value):
         year = dt.date.today().year
         if not (value <= year):
             raise serializers.ValidationError('Проверьте год произведения!')
         return value
+
+
+class TitleSerializerCreateUpdate(serializers.ModelSerializer):
+    """Сериализатор для названий произведений, методы
+    'create', 'partial_update', 'destroy' """
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Categories.objects.all(), required=False)
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genres.objects.all(), many=True,
+        required=False)
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -86,28 +105,31 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = ('id', 'review_id', 'text', 'pub_date', 'author')
-        read_only_fields = ('id', 'pub_date', 'author', 'review_id')
+        fields = ('id', 'review', 'text', 'pub_date', 'author')
+        read_only_fields = ('id', 'pub_date', 'author', 'review')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для обзоров,
     дату, автора и все id можно только получить."""
+    title = serializers.SlugRelatedField(
+        slug_field='name', read_only=True)
     author = serializers.SlugRelatedField(
         slug_field='username',
-        read_only=True
-    )
+        read_only=True,
+        default=serializers.CurrentUserDefault())
 
-    def validate(self, data):
-        if Reviews.objects.filter(
-            author=data['author'], title_id=data['title_id']
-        ).exists():
-            raise serializers.ValidationError(
-                'Нельзя создавать больше одного обзора'
-            )
-        return data
+    # def validate(self, data):
+    #     if Review.objects.filter(
+    #         author=data['author'], title_id=data['title_id']
+    #     ).exists():
+    #         raise serializers.ValidationError(
+    #             'Нельзя создавать больше одного обзора'
+    #         )
+    #     return data
+    # нужно решить какой из валидаторов оставлять и допилить
 
     class Meta:
-        model = Reviews
-        fields = ('id', 'title_id', 'text', 'pub_date', 'author', 'score')
-        read_only_fields = ('id', 'pub_date', 'author', 'title_id')
+        model = Review
+        fields = ('id', 'title', 'text', 'pub_date', 'author', 'score')
+        read_only_fields = ('id', 'pub_date', 'author', 'title')

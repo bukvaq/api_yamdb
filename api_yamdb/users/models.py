@@ -3,6 +3,7 @@ from django.db import models
 
 
 class UserRoles:
+    """Класс для выбора роли."""
     USER = "user"
     MODERATOR = "moderator"
     ADMIN = "admin"
@@ -14,7 +15,7 @@ class UserRoles:
 
 
 class User(AbstractUser):
-
+    """Модель Пользователя."""
     bio = models.TextField(
         'Биография',
         blank=True,
