@@ -5,6 +5,7 @@ from users.models import User
 
 
 class Categories(models.Model):
+    """Модель для хранения категорий."""
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
 
@@ -13,6 +14,7 @@ class Categories(models.Model):
 
 
 class Genres(models.Model):
+    """Модель для хранения жанров."""
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
 
@@ -21,9 +23,14 @@ class Genres(models.Model):
 
 
 class Titles(models.Model):
+    """Модель для хранения названий произведений."""
     name = models.CharField(max_length=256)
     year = models.IntegerField()
-    category = models.ForeignKey(Categories, on_delete=models.PROTECT)
+
+    category = models.ForeignKey(
+        Categories, on_delete=models.SET_NULL,
+        related_name='titles', blank=True, null=True
+    )
     genre = models.ManyToManyField(Genres)
     description = models.TextField(blank=True)
 

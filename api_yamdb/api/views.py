@@ -3,7 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status, filters, mixins
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -88,28 +88,32 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
+class CustomViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                    mixins.ListModelMixin, viewsets.GenericViewSet):
+    pass
+
+
+class CategoriesViewSet(CustomViewSet):
+    """Вьюсет для категорий."""
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter)
     search_fields = ('name',)
     permission_classes = (AdminPermissionOrReadOnly,)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
+    """Вьюсет для названий произведений."""
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
-    pagination_class = PageNumberPagination
-    filter_backends = (DjangoFilterBackend)
     filterset_fields = ('category', 'genre', 'name', 'year')
     permission_classes = (AdminPermissionOrReadOnly,)
 
 
-class GenresViewSet(viewsets.ModelViewSet):
+class GenresViewSet(CustomViewSet):
+    """Вьюсет для жанров."""
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter)
     search_fields = ('name',)
     permission_classes = (AdminPermissionOrReadOnly,)

@@ -45,25 +45,26 @@ class UserSerializer(UserForAdminSerializer):
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(validators=[UniqueValidator(
-        queryset=Categories.objects.all())])
+    """Сериализатор для категорий."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Categories
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(validators=[UniqueValidator(
-        queryset=Genres.objects.all())])
+    """Сериализатор для жанров."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Genres
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    genre = serializers.StringRelatedField(many=True)
+    """Сериализатор для названий произведений."""
+    genre = GenresSerializer(many=True, read_only=True)
+    category = CategoriesSerializer(read_only=True)
+    score = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = '__all__'
