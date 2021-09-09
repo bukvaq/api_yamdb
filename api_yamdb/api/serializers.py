@@ -121,10 +121,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context.get('request')
-        title = self.context.get('title')
-        if Review.objects.filter(
-            author=request.user, title=title
-        ).exists():
+        if request.method != 'POST':
+            return data
+        title = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=request.user, title=title).exists():
             raise serializers.ValidationError(
                 'Нельзя создавать больше одного обзора'
             )
