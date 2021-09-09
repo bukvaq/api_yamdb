@@ -5,7 +5,6 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, filters, mixins
 from rest_framework.decorators import api_view, action
-# from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
@@ -142,9 +141,6 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
-
-    def perform_update(self, serializer):
-        return super().perform_update(serializer)
 
 
 class CommentsViewSet(ReviewsViewSet):
