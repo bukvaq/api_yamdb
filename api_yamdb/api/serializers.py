@@ -123,7 +123,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         title = self.context.get('title')
         if Review.objects.filter(
-            author=request.user, title__name=title
+            author=request.user, title=title
         ).exists():
             raise serializers.ValidationError(
                 'Нельзя создавать больше одного обзора'
