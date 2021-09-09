@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Categories, Title, Genres, Review
 from users.models import User
-# from .filters import CustomFilter
+from .filters import CustomFilter
 from .permissions import IsAdmin, ReviewPermission, AdminPermissionOrReadOnly
 from .serializers import (
     UserSerializer,
@@ -112,8 +112,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     filterset_fields = ('category', 'genre', 'name', 'year')
     permission_classes = (AdminPermissionOrReadOnly,)
-
-    # filterset_class = CustomFilter
+    filterset_class = CustomFilter
 
     def get_serializer_class(self):
         if self.action in ['create', 'partial_update', 'destroy']:
