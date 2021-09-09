@@ -45,25 +45,26 @@ class UserSerializer(UserForAdminSerializer):
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(validators=[UniqueValidator(
-        queryset=Categories.objects.all())])
+    """Сериализатор для категорий."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Categories
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(validators=[UniqueValidator(
-        queryset=Genres.objects.all())])
+    """Сериализатор для жанров."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Genres
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    genre = serializers.StringRelatedField(many=True)
+    """Сериализатор для названий произведений."""
+    genre = GenresSerializer(many=True, read_only=True)
+    category = CategoriesSerializer(read_only=True)
+    score = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = '__all__'
@@ -75,7 +76,7 @@ class TitlesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Проверьте год произведения!')
         return value
 
-      
+
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для комментариев,
     дату, автора и все id можно только получить."""
@@ -101,4 +102,4 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'title_id', 'text', 'pub_date', 'author', 'score')
-        read_only_fields = ('id', 'pub_date', 'author', 'title_id')      
+        read_only_fields = ('id', 'pub_date', 'author', 'title_id')
