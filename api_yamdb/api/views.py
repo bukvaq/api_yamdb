@@ -127,7 +127,7 @@ class GenresViewSet(CustomViewSet):
     serializer_class = GenresSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    lookup_field = "slug"
+    lookup_field = 'slug'
     permission_classes = (AdminPermissionOrReadOnly,)
 
 
@@ -141,7 +141,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         # if Review.objects.filter(author=self.request.user,
         #                          title=title).exists():
         #     raise ValidationError('Нельзя ставить оценку повторно')
