@@ -119,15 +119,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault())
 
-    # def validate(self, data):
-    #     if Review.objects.filter(
-    #         author=data['author'], title_id=data['title_id']
-    #     ).exists():
-    #         raise serializers.ValidationError(
-    #             'Нельзя создавать больше одного обзора'
-    #         )
-    #     return data
-    # нужно решить какой из валидаторов оставлять и допилить
+    def validate(self, data):
+        request = self.context.get('request')
+        if request.method != 'POST':
+            return data
+        title = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=request.user, title=title).exists():
+            raise serializers.ValidationError(
+                'Нельзя создавать больше одного обзора'
+            )
+        return data
 
     class Meta:
         model = Review
