@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from users.models import User
@@ -22,7 +21,7 @@ class Genres(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     """Модель для хранения названий произведений."""
     name = models.CharField(max_length=256)
     year = models.IntegerField()
@@ -38,7 +37,7 @@ class Titles(models.Model):
         return self.name
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     """Модель для хранения обзоров,
     оценки можно ставить от 1 до 10."""
 
@@ -47,8 +46,8 @@ class Reviews(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews'
     )
-    title_id = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='reviews'
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews', null=True
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
@@ -60,7 +59,7 @@ class Reviews(models.Model):
         return self.text
 
     class Meta:
-        unique_together = ('author', 'title_id')
+        unique_together = ('author', 'title')
 
 
 class Comments(models.Model):
@@ -69,8 +68,8 @@ class Comments(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments'
     )
-    review_id = models.ForeignKey(
-        Reviews, on_delete=models.CASCADE, related_name='comments'
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
