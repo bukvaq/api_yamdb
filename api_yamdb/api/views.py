@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Categorie, Title, Genre, Review
+from reviews.models import Category, Title, Genre, Review
 from users.models import User
 from .filters import CustomFilter
 from .mixins import CustomViewSet
@@ -22,7 +22,7 @@ from .serializers import (
     CommentSerializer,
     ReviewSerializer,
     GenreSerializer,
-    CategorieSerializer,
+    CategorySerializer,
     TitleSerializer,
     TitleSerializerCreateUpdate
 )
@@ -88,8 +88,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class CategorieViewSet(CustomViewSet):
     """Вьюсет для категорий."""
-    queryset = Categorie.objects.all()
-    serializer_class = CategorieSerializer
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = "slug"

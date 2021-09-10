@@ -1,9 +1,8 @@
 from django.utils import timezone
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Comments, Review, Categorie, Genre, Title
+from reviews.models import Comments, Review, Category, Genre, Title
 from users.models import User
 
 
@@ -53,12 +52,12 @@ class UserSerializer(UserForAdminSerializer):
     role = serializers.CharField(read_only=True)
 
 
-class CategorieSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий."""
 
     class Meta:
         exclude = ('id',)
-        model = Categorie
+        model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -72,7 +71,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор для названий произведений, метод 'list' """
     genre = GenreSerializer(many=True, read_only=True)
-    category = CategorieSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -90,7 +89,7 @@ class TitleSerializerCreateUpdate(serializers.ModelSerializer):
     """Сериализатор для названий произведений, методы
     'create', 'partial_update', 'destroy' """
     category = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Categorie.objects.all(), required=False)
+        slug_field='slug', queryset=Category.objects.all(), required=False)
     genre = serializers.SlugRelatedField(
         slug_field='slug', queryset=Genre.objects.all(), many=True,
         required=False)

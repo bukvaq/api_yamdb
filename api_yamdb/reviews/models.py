@@ -1,22 +1,22 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils import timezone
 
 from users.models import User
 
 
-class Categorie(models.Model):
+class Category(models.Model):
     """Модель для хранения категорий."""
-    name = models.CharField(max_length=256, verbose_name='Сategorie name')
+    name = models.CharField(max_length=256, verbose_name='Category name')
     slug = models.SlugField(
-        max_length=50, unique=True, verbose_name='Сategorie slug'
+        max_length=50, unique=True, verbose_name='Category slug'
     )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = 'Сategorie'
+        verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
 
@@ -47,7 +47,7 @@ class Title(models.Model):
         validators=[year_validator], verbose_name='Artwork year'
     )
     category = models.ForeignKey(
-        Categorie, on_delete=models.SET_NULL,
+        Category, on_delete=models.SET_NULL,
         related_name='titles', blank=True, null=True,
         verbose_name='Artwork category'
     )
