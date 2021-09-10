@@ -42,6 +42,11 @@ class UserForAdminSerializer(serializers.ModelSerializer):
         fields = ('username', 'first_name', 'last_name',
                   'email', 'role', 'bio')
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Некорректный ник-нейм!')
+        return value
+
 
 class UserSerializer(UserForAdminSerializer):
     """Сериализатор для пользователя-админа."""
