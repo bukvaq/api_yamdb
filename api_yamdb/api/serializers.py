@@ -1,9 +1,9 @@
-import datetime as dt
+from django.utils import timezone
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Comments, Review, Categories, Genres, Title
+from reviews.models import Comments, Review, Categorie, Genre, Title
 from users.models import User
 
 
@@ -53,26 +53,26 @@ class UserSerializer(UserForAdminSerializer):
     role = serializers.CharField(read_only=True)
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
+class CategorieSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий."""
 
     class Meta:
-        fields = ('name', 'slug')
-        model = Categories
+        exclude = ('id',)
+        model = Categorie
 
 
-class GenresSerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров."""
 
     class Meta:
-        fields = ('name', 'slug')
-        model = Genres
+        exclude = ('id',)
+        model = Genre
 
 
-class TitlesSerializer(serializers.ModelSerializer):
+class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор для названий произведений, метод 'list' """
-    genre = GenresSerializer(many=True, read_only=True)
-    category = CategoriesSerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorieSerializer(read_only=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -80,7 +80,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         model = Title
 
     def validate_title_year(self, value):
-        year = dt.date.today().year
+        year = timezone.now().year
         if not (value <= year):
             raise serializers.ValidationError('Проверьте год произведения!')
         return value
@@ -90,9 +90,9 @@ class TitleSerializerCreateUpdate(serializers.ModelSerializer):
     """Сериализатор для названий произведений, методы
     'create', 'partial_update', 'destroy' """
     category = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Categories.objects.all(), required=False)
+        slug_field='slug', queryset=Categorie.objects.all(), required=False)
     genre = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Genres.objects.all(), many=True,
+        slug_field='slug', queryset=Genre.objects.all(), many=True,
         required=False)
 
     class Meta:

@@ -3,21 +3,21 @@ from rest_framework import routers
 
 from .views import (
     UserViewSet,
-    TitlesViewSet,
-    CategoriesViewSet,
+    TitleViewSet,
+    CategorieViewSet,
     CommentsViewSet,
-    GenresViewSet,
+    GenreViewSet,
     ReviewsViewSet
 )
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet,
                 basename='users')
-router.register(r'titles', TitlesViewSet,
+router.register(r'titles', TitleViewSet,
                 basename='titles')
-router.register('categories', CategoriesViewSet,
+router.register('categories', CategorieViewSet,
                 basename='categories')
-router.register(r'genres', GenresViewSet,
+router.register(r'genres', GenreViewSet,
                 basename='genres')
 router.register(r'titles/(?P<title_id>\d+)/reviews',
                 ReviewsViewSet, basename='reviews')

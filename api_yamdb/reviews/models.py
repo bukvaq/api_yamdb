@@ -1,40 +1,67 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from users.models import User
 
 
-class Categories(models.Model):
+class Categorie(models.Model):
     """Модель для хранения категорий."""
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=256, verbose_name='Сategorie name')
+    slug = models.SlugField(
+        max_length=50, unique=True, verbose_name='Сategorie slug'
+    )
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Сategorie'
+        verbose_name_plural = 'Categories'
 
-class Genres(models.Model):
+
+class Genre(models.Model):
     """Модель для хранения жанров."""
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=256, verbose_name='Genre name')
+    slug = models.SlugField(
+        max_length=50, unique=True, verbose_name='Genre slug'
+    )
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Genre'
+        verbose_name_plural = 'Genres'
+
+
+def year_validator(value):
+    if value > timezone.now().year:
+        raise ValidationError('Укажите корректный год!')
 
 
 class Title(models.Model):
     """Модель для хранения названий произведений."""
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
-
-    category = models.ForeignKey(
-        Categories, on_delete=models.SET_NULL,
-        related_name='titles', blank=True, null=True
+    name = models.CharField(max_length=256, verbose_name='Artwork title')
+    year = models.IntegerField(
+        validators=[year_validator], verbose_name='Artwork year'
     )
-    genre = models.ManyToManyField(Genres)
-    description = models.TextField(blank=True)
+    category = models.ForeignKey(
+        Categorie, on_delete=models.SET_NULL,
+        related_name='titles', blank=True, null=True,
+        verbose_name='Artwork category'
+    )
+    genre = models.ManyToManyField(Genre, verbose_name='Artwork genre')
+    description = models.TextField(
+        blank=True, verbose_name='Artwork description'
+    )
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Title'
+        verbose_name_plural = 'Titles'
 
 
 class Review(models.Model):
