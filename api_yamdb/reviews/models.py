@@ -69,8 +69,6 @@ class Review(models.Model):
     """Модель для хранения обзоров,
     оценки можно ставить от 1 до 10."""
 
-    SCORE_CHOICES = [(i, str(i)) for i in range(1, 11)]
-
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews'
     )
@@ -81,7 +79,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True, db_index=True
     )
-    score = models.IntegerField(validators=[
+    score = models.IntegerField(default=1, validators=[
         MaxValueValidator(10),
         MinValueValidator(1)
     ])
