@@ -79,7 +79,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True, db_index=True
     )
-    score = models.IntegerField(validators=[
+    score = models.IntegerField(default=1, validators=[
         MaxValueValidator(10),
         MinValueValidator(1)
     ])

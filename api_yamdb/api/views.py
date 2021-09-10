@@ -99,7 +99,6 @@ class CategorieViewSet(CustomViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для названий произведений."""
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    filterset_fields = ('category', 'genre', 'name', 'year')
     permission_classes = (AdminPermissionOrReadOnly,)
     filterset_class = CustomFilter
 
