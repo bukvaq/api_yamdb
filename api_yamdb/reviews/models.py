@@ -69,8 +69,6 @@ class Review(models.Model):
     """Модель для хранения обзоров,
     оценки можно ставить от 1 до 10."""
 
-    SCORE_CHOICES = [(i, str(i)) for i in range(1, 11)]
-
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews'
     )
