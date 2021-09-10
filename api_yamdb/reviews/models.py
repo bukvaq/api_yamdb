@@ -96,7 +96,7 @@ class Review(models.Model):
         return self.text
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     """Модель для комментариев под обзорами."""
 
     author = models.ForeignKey(

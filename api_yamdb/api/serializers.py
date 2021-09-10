@@ -2,7 +2,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Comments, Review, Category, Genre, Title
+from reviews.models import Comment, Review, Category, Genre, Title
 from users.models import User
 
 
@@ -108,7 +108,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Comments
+        model = Comment
         fields = ('id', 'review', 'text', 'pub_date', 'author')
         read_only_fields = ('id', 'pub_date', 'author', 'review')
 
