@@ -3,15 +3,16 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status, filters, mixins
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Categories, Title, Genres, Review
+from reviews.models import Categorie, Title, Genre, Review
 from users.models import User
 from .filters import CustomFilter
+from .mixins import CustomViewSet
 from .permissions import IsAdmin, ReviewPermission, AdminPermissionOrReadOnly
 from .serializers import (
     UserSerializer,
@@ -20,9 +21,9 @@ from .serializers import (
     UserForAdminSerializer,
     CommentSerializer,
     ReviewSerializer,
-    GenresSerializer,
-    CategoriesSerializer,
-    TitlesSerializer,
+    GenreSerializer,
+    CategorieSerializer,
+    TitleSerializer,
     TitleSerializerCreateUpdate
 )
 
@@ -88,23 +89,17 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CustomViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                    mixins.ListModelMixin, viewsets.GenericViewSet):
-    """Кастомный вьюсет для Категорий и для Жанров"""
-    pass
-
-
-class CategoriesViewSet(CustomViewSet):
+class CategorieViewSet(CustomViewSet):
     """Вьюсет для категорий."""
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
+    queryset = Categorie.objects.all()
+    serializer_class = CategorieSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = "slug"
     permission_classes = (AdminPermissionOrReadOnly,)
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
+class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для названий произведений."""
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     filterset_fields = ('category', 'genre', 'name', 'year')
@@ -114,13 +109,13 @@ class TitlesViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['create', 'partial_update', 'destroy']:
             return TitleSerializerCreateUpdate
-        return TitlesSerializer
+        return TitleSerializer
 
 
-class GenresViewSet(CustomViewSet):
+class GenreViewSet(CustomViewSet):
     """Вьюсет для жанров."""
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializer
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
