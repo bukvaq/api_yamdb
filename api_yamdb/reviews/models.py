@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import User
 
@@ -80,13 +81,21 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True, db_index=True
     )
-    score = models.IntegerField(choices=SCORE_CHOICES)
+    score = models.IntegerField(validators=[
+        MaxValueValidator(10),
+        MinValueValidator(1)
+    ])
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name='unique_reviews'
+            ),
+        ]
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.text
-
-    class Meta:
-        unique_together = ('author', 'title')
 
 
 class Comments(models.Model):
@@ -102,6 +111,9 @@ class Comments(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True, db_index=True
     )
+
+    class Meta:
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.text
