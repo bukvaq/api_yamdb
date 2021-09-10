@@ -34,9 +34,6 @@ def signup(request):
     serializer_data.is_valid(raise_exception=True)
     email = serializer_data.validated_data.get('email')
     username = serializer_data.validated_data.get('username')
-    if username == 'me':
-        return Response('неверное имя пользователя',
-                        status=status.HTTP_400_BAD_REQUEST)
     user, create = User.objects.get_or_create(email=email, username=username)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(

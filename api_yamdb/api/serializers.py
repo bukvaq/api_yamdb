@@ -20,6 +20,11 @@ class EmailSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username')
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Некорректный ник-нейм!')
+        return value
+
 
 class ConfirmationSerializer(serializers.ModelSerializer):
     """Сериализатор для кода подтверждения."""
@@ -41,11 +46,6 @@ class UserForAdminSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'first_name', 'last_name',
                   'email', 'role', 'bio')
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError('Некорректный ник-нейм!')
-        return value
 
 
 class UserSerializer(UserForAdminSerializer):
