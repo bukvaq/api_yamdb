@@ -38,7 +38,7 @@ def signup(request):
     user, create = User.objects.get_or_create(email=email, username=username)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
-        'On your email was send confirmation cod',
+        'Confirmation code has been sent to your adress',
         f'Ваш код подтверждения: {confirmation_code}',
         settings.DEFAULT_FROM_EMAIL, [email])
     return Response({'email': email, 'username': username})
