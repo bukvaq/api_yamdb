@@ -1,8 +1,6 @@
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from api.validator import year_validator
 from users.models import User
 
 
@@ -34,11 +32,6 @@ class Genre(models.Model):
     class Meta:
         verbose_name = 'Genre'
         verbose_name_plural = 'Genres'
-
-
-def year_validator(value):
-    if value > timezone.now().year:
-        raise ValidationError('Укажите корректный год!')
 
 
 class Title(models.Model):
@@ -80,8 +73,8 @@ class Review(models.Model):
         auto_now_add=True, db_index=True
     )
     score = models.IntegerField(default=1, validators=[
-        MaxValueValidator(10),
-        MinValueValidator(1)
+        MaxValueValidator(10, 'Оценка не может быть больше 10'),
+        MinValueValidator(1, 'Оценка не может быть меньше 1')
     ])
 
     class Meta:
